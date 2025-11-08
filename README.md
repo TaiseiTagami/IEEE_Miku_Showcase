@@ -9,8 +9,9 @@ IEEE Showcase project
 This project's goal is to use position tracking and perspective projection to render scenes in Unity that update according to the viewer's position. This creates a 3D effect on the display, similar to a hologram. Specifically, the aim is to replicate the company Portalgraph's proprietary product.
 
 ### Demo examples from Portalgaph:
-Displaying a 3D top-down map view on a single display: [text](https://www.youtube.com/watch?v=qkbcDqxHRkM)
-Displaying an animated 3D character model in 3D space on two displays: [text](https://www.youtube.com/watch?v=U7bCu9H4aw4)
+[Displaying a 3D top-down map view on a single display](https://www.youtube.com/watch?v=qkbcDqxHRkM)
+
+[Displaying an animated 3D character model in 3D space on two displays](https://www.youtube.com/watch?v=U7bCu9H4aw4)
 
 ## Current Progress
 
@@ -31,7 +32,7 @@ As for the Unity files, apparently Git is bad with binary files. It just so happ
 
 ---
 
-# Current To-Do
+## Current To-Do
 
 ### 1. Make facetracking distance tracking work better
 
