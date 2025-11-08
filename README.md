@@ -31,6 +31,8 @@ Currently, face tracking works pretty well using **PnP** (black magic included i
 I'm thinking maybe we can use the distance between certain landmarks, along with the height and width of the face, to determine the angle of the face.
 Given how incredibly advanced OpenCV is though, there might be some method built in that just does that for you. I'm yet to find that though.
 
+This'll take a decent lot of programming logic and figuring out the opencv library.
+
 #### 1.a Determine the necessary camera quality for accurate-enough face tracking
 
 Once the face tracking works, we need to find the necessary resolution of the camera so we can buy the cheapest webcam possible for the project. This would probably just be trial and error, conducted by passing a video in the facetracking script instead of a camera and seeing how accurate it is for different video resolutions.
@@ -39,7 +41,9 @@ Once the face tracking works, we need to find the necessary resolution of the ca
 
 ### 2. Begin developing facetracking prediction
 
-Some kind of prediction system that would estimate where the face would go would be great. For whoever is developing this, you can assume that the facetracking performs flawlessly and gives you accurate and consistent positions.
+Some kind of prediction system that would estimate where the face would go would be great. For whoever is developing this, you can assume that the facetracking performs flawlessly and gives you accurate and consistent positions. There may be a library out there to do it for you but I think this would be a good thing to develop.
+
+This would be mostly math, research, and only take basic programming. The math would be a pain though.
 
 ---
 
@@ -49,9 +53,9 @@ This might mess up a lot of the code written before and we might not have enough
 
 ---
 
-### 4. Projection mapping in Unity
+### 4. Perspective projection in Unity
 
-I'm doing projection mapping using matrices to try to project what the viewer should be seeing from their position in real life in the Unity scene. Currently, I have the live positioning in reference to the camera, viewer's line of sight and viewing angles, and simulated monitor objects equivalent to the real-world monitors working. Some of the projection mapping is working, but tbh I don't fully understand how it's working and it's still wonky. I haven't really had the chance to test it in the real world either so it'll prob require a lot of calibration parameters that I haven't implemented. Hopefully I can get my hands on some monitors soon.
+I'm trying to use perspective projection formulas using matrices to try to project what the viewer should be seeing from their position in real life in the Unity scene. Currently, I have the live positioning in reference to the camera, viewer's line of sight and viewing angles, and simulated monitor objects equivalent to the real-world monitors working. Some of the projection mapping is working, but tbh I don't fully understand how it's working and it's still wonky. I haven't really had the chance to test it in the real world either so it'll prob require a lot of calibration parameters that I haven't implemented. Hopefully I can get my hands on some monitors soon.
 
 ---
 
