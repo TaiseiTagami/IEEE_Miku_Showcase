@@ -5,7 +5,16 @@ IEEE Showcase project
 
 ---
 
-## Tracking
+## The Project
+This project's goal is to use position tracking and perspective projection to render scenes in Unity that update according to the viewer's position. This creates a 3D effect on the display, similar to a hologram. Specifically, the aim is to replicate the company Portalgraph's proprietary product.
+
+### Demo examples from Portalgaph:
+Displaying a 3D top-down map view on a single display: [text](https://www.youtube.com/watch?v=qkbcDqxHRkM)
+Displaying an animated 3D character model in 3D space on two displays: [text](https://www.youtube.com/watch?v=U7bCu9H4aw4)
+
+## Current Progress
+
+### Tracking
 So right now this is the tracking we have. Note that it takes **cv2**, **mediapipe**, and **numpy** (unless that one already comes preinstalled). You can install those through:
 ```bash
 pip install opencv-python
@@ -16,13 +25,13 @@ pip install mediapipe
 
 ---
 
-## Unity Files
+### Unity Files
 
 As for the Unity files, apparently Git is bad with binary files. It just so happens that Unity is basically all binary files. I'm struggling with getting the push working with my Unity files (even with .gitignore unless I'm setting that up wrong), so those aren't there yet. If you want to work on Unity files, just let me know and I'll upload those individually.
 
 ---
 
-## Current To-Do
+# Current To-Do
 
 ### 1. Make facetracking distance tracking work better
 
