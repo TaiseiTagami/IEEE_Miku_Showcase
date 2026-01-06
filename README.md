@@ -1,101 +1,241 @@
+# IEEE Miku Showcase: Head-Coupled Off-Axis Projection
 
+A real-time “holographic” display built with Unity and vision-based head tracking. The viewer’s head position is tracked in 3D and used to dynamically adjust the camera’s frustum, creating a convincing window-into-3D effect on one or more monitors.
 
-# IEEE Miku Showcase
-IEEE Showcase project
+This repository includes:
+- A Unity project for perspective-correct rendering
+- A Python head-tracking pipeline (MediaPipe/OpenCV) with optional ArUco marker tracking
+- Optional Arduino pan-tilt rig for active webcam framing
+- Optional wired/wireless link for sending tracking data to another machine
+
+Note: This project is not affiliated with Portalgraph; it is an academic/club showcase inspired by similar techniques.
 
 ---
 
-## The Project
-This project's goal is to use position tracking and perspective projection to render scenes in Unity that update according to the viewer's position. This creates a 3D effect on the display, similar to a hologram. Specifically, the aim is to replicate the company Portalgraph's proprietary product.
+## Features
 
-### NOTE: I will add "deadlines" to each task. This basically means that by this deadline, if it isn't finished, I will begin working on that task myself because it's too close to the showcase day.
+- Real-time head pose estimation (position + orientation)
+- Perspective-correct projection in Unity for a window-like 3D illusion
+- Multi-monitor support
+- Optional ArUco-based tracking as a fallback or for testing
+- Optional prediction filter to reduce jitter/latency
+- Optional pan-tilt webcam control via Arduino servos
+- Optional cross-machine streaming of tracking data (UDP/TCP)
 
-### Demo examples from Portalgaph:
-[Displaying a 3D top-down map view on a single display](https://www.youtube.com/watch?v=qkbcDqxHRkM)
+---
 
-[Displaying an animated 3D character model in 3D space on two displays](https://www.youtube.com/watch?v=U7bCu9H4aw4)
+## Quick Start
 
-## Current Progress
+1) Clone the repository.
 
-### Tracking
-So right now this is the tracking we have. Note that it takes **cv2**, **mediapipe**, and **numpy** (unless that one already comes preinstalled). You can install those through:
+2) Install tracking dependencies (Python 3.9+ recommended):
 ```bash
-pip install opencv-python
-pip install mediapipe
-````
+pip install opencv-python mediapipe numpy
+```
 
-*For mediapipe, you might have to install a model, I'm not sure. Let me know if it doesn't work.*
+3) (Optional but recommended) Calibrate your camera for best depth accuracy using a checkerboard and OpenCV (see “Calibration”).
 
----
+4) Open a Unity project in the specified Unity version (see “Requirements”). Import SampleScene.unity and UnityScripts into Unity. Enter your display’s physical dimensions and camera parameters in the calibration UI and adjust the location/number of the monitors according to your monitor orientation.
 
-### Unity Files
+5) Start the tracking script. By default it will:
+- Use your default webcam
+- Estimate head pose
+- Stream 3D position/orientation to Unity over localhost
 
-As for the Unity files, apparently Git is bad with binary files. It just so happens that Unity is basically all binary files. I'm struggling with getting the push working with my Unity files (even with .gitignore unless I'm setting that up wrong), so those aren't there yet. If you want to work on Unity files, just let me know and I'll upload those individually.
-
-It is almost finished though (it works at least, I just have to do some polishing. )  (:
-
----
-
-## Current To-Do
-
-### 1. Make facetracking distance tracking work better (11/15)
-
-Currently, face tracking works pretty well using **PnP** (black magic included in the OpenCV library). However, the distance from the screen is currently scaled using the overall size of a bounding box around the face, which causes a lot of inaccuracies when the head isn't facing directly toward the camera and whatnot. It'd be great if that could be fixed.
-
-I'm thinking maybe we can use the distance between certain landmarks, along with the height and width of the face, to determine the angle of the face.
-Given how incredibly advanced OpenCV is though, there might be some method built in that just does that for you. I'm yet to find that though.
-
-This'll take a decent lot of programming logic and figuring out the opencv library.
-
-#### 1.a Determine the necessary camera quality for accurate-enough face tracking
-
-Once the face tracking works, we need to find the necessary resolution of the camera so we can buy the cheapest webcam possible for the project. This would probably just be trial and error, conducted by passing a video in the facetracking script instead of a camera and seeing how accurate it is for different video resolutions.
+6) Press Play in Unity. Move your head and your scene should update as if you’re looking through a window into a 3D world.
 
 ---
 
-### 2. Develop arUco tracking in 3D space (11/14)
+## Requirements
 
-arUco tracking would allow for us to test the Unity program using a camera with an arUco grid attached to it, and if worst comes to worst, we can forego face prediction and make them glasses/headband with an arUco grid on them. This would be an entirely new script. Don't worry about UDP protocal for now, I'll take care of that later once the script works.
-
----
-
-### 3. Begin developing facetracking prediction (11/15)
-
-Some kind of prediction system that would estimate where the face would go would be great. For whoever is developing this, you can assume that the facetracking performs flawlessly and gives you accurate and consistent positions. There may be a library out there to do it for you but I think this would be a good thing to develop.
-
-This would be mostly math, research, and only take basic programming. The math would be a pain though.
-
----
-
-### 4. Arduino code for potentially a rotating webcam (11/15)
-
-Update: I 100% want to do this.
-We'll have two servo motors that hook up to the webcam, allowing us to adjust the angle in all directions, not just side to side. This'll have to be written in Arduino code (C++ but wiht little Arduino quirks).
-
-Whoever's working on this, assume that the face tracking code is perfectly accurate. 
+- Unity: LTS 2021.3+ or 2022.3+ (update this to the version you used)
+- Python: 3.9–3.11
+- OS: Windows/macOS/Linux (tracking and Unity tested on desktop)
+- Webcam: 720p+ recommended; 1080p improves stability
+- Optional:
+  - Printed checkerboard for camera calibration (not yet implemented)
+  - ArUco markers for marker-based tracking (Currently less accurate than face tracking and needs considerable improvement.)
+  - Arduino-compatible board + 2x micro servos for pan-tilt rig
+  - Wired LAN if streaming tracking to another machine
 
 ---
 
-### 5. Perspective projection in Unity
+## Repository Structure
 
-IT WORKS!! I'm going to brush things up, make the parameters more intuitive, and clean up the code, but it functions. I'm yet to test it on mulitple monitors, but it should theoretically work. I may have to do further tweaking to render multiple cameras at once, but I don't think that'll be the case.
+- UnityScripts/ … Unity scripts
+    - ProjectionLogic/ … Projection logic scripts
+    - CenterPoint.cs … Center point of the scene for debugging
+    - DisplayManager.cs … Display logic gameobject
+    - FaceTrackingReceiver.cs … Deprecated UDP receiver (provided as fallback)
+    - MonitorSetUp.cs … Monitor settings and management
+    - RectangleGizmo.cs … Gizmo generator for debugging
+    - UdpPoseProvider.cs … UDP receiver
+    - ViewerFromNetwork.cs … Viewer position modifier using UdpPoseProvider.cs
+    - ViewerPOVFollow.cs … Debugging camera position modifier to test viewer's POV
+    - WebcamCenterFromAngle.cs … Debugging camera angle modifier to consistently face the CenterPoint.cs gameobject
+    -  WebcamOrbitDriver.cs … Optional script to consider an offset in position between the webcam and the axis of rotation when using pan-tilt
+- faceTrackingPnP.py … MediaPipe/OpenCV-based face/pose tracking and UDP sender
+- arUco / … arUco scripts (needs improvement)
+    - aruco_tracking.py … ArUco-based 6DoF tracking and UDP sender
+    - aruco_print.py … ArUco PDF generator
+- panTiltServoFaceTracking.ino … Servo control for webcam pan/tilt
+- SampleScene.unity … Sample Unity scene
 
 ---
 
-### 6. (Potential) Sending Position data from one computer to another over a wired connection.
+## Installation & Setup
 
-Since the webcam would be feeding in high resolution data at a high framerate (preferably), it might take too much processing power if it's running along with the UNity scene. I'm assuming wired protocal is extremely fast and doesn't introduce much delay, but I haven't worked with that before so I can't say. Wireless HTTP protocal or webhooks may work as well, but there will be an unavoidable delay.
+### 1) Python Tracking
+
+Install dependencies:
+```bash
+pip install opencv-python mediapipe numpy pyyaml
+```
+
+Run tracking:
+```bash
+python faceTrackingPnP.py --camera 0 --send-udp 127.0.0.1:5005
+```
+
+Notes:
+- MediaPipe downloads required face landmark models automatically on first run.
+- If you prefer marker tracking, use:
+```bash
+python arUco/aruco_tracking.py --camera 0 --dict DICT_4X4_50 --send-udp 127.0.0.1:5005
+```
+
+Configuration:
+- Edit tracking/config.yaml to set:
+  - camera index/resolution/fps
+  - UDP/TCP target (IP:port)
+  - smoothing/prediction parameters
+  - camera intrinsics (if calibrated)
+
+### 2) Unity
+
+- Open UnityProject/ in Unity.
+- Import SampleScene.unity
+- Labeled Scene Setup:
+![Labeled Scene Setup](labeledSceneSetup.png)
+- Topdown View:
+![topdown](topdownView.png)
+- Viewer's POV, where red is projected onto the monitors and blue is the true object:
+![POV](viewersPOV.png)
+- In the sample scene (Scenes/SampleScene.unity):
+  - Configure display width, height, and physical distance to viewer origin if needed.
+  - Enable multi-display if using multiple monitors (Edit > Project Settings > Player > Resolution and Presentation).
+
+Networking in Unity:
+- Ensure the UDP listener component uses the same port as your tracking script.
+- The default protocol is compact JSON (see below). You can switch to TCP/WebSocket if desired.
+
+Example tracking payload:
+```json
+{
+  "t": 1736200000.123,
+  "pos": [x, y, z],        // meters, right-handed Unity coordinates
+  "rot": [qx, qy, qz, qw], // quaternion
+  "quality": 0.0-1.0       // optional confidence
+}
+```
+
+### 3) Optional: Cross-Machine Setup
+
+- On the tracking machine, run the script with `--send-udp REMOTE_IP:PORT`.
+- On the Unity machine, enter `PORT` in the UDP listener and ensure your firewall allows inbound UDP.
+- Prefer wired Ethernet for lowest latency.
+- Needs further testing to ensure functionality.
 
 ---
 
-## Shopping List
+## Calibration (currently not implemented)
 
-Budget: $50.00
+Accurate depth depends on correct camera intrinsics and display geometry.
 
-Webcam: [Arducam 1080P Day and Night Vision USB Camera ($34.99)](https://www.amazon.com/Arducam-Computer-Automatic-Switching-All-Day/dp/B0829HZ3Q7?crid=21YI8U4UZ7DKL&dib=eyJ2IjoiMSJ9.z9-2jy-PjVuQhymGSMDVVCCdHB3hVFtRiLBGstOnNW-BW4qiXuCxR-DjEZ_F9EViUTIzh-lLB6scju5lDCtcnKpOhMXysZAXSWUeRA4S9ByjalhpunF24L6q1QEmcWLB-7RUySTfvqVgekBUc9tNByFtrkz6T-cNgg5KdKClQxY8wB62S_6RBoon--3ljxiuxlw7_cMvo_fZyTEB4dwPzuzWbGCR4038wrj1ORRusbQ.zdmMy4skk9rLNLlULifNQqZsGBgzlKQ_Fvdtb2NC_p8&dib_tag=se&keywords=arduino+webcam&qid=1762804508&sprefix=arduinowebcam%2Caps%2C103&sr=8-3)
-This one has night vision, which I think would make sense for dark rooms and such. Weight is 0.07 kg.
+- Camera intrinsics:
+  - Print a checkerboard (e.g., 9×6 inner corners, 25 mm squares).
+  - Use tracking/calib/calibrate_camera.py to compute fx, fy, cx, cy, and distortion coefficients.
+  - Save results to config.yaml and restart the tracker.
+- Display setup:
+  - Measure your display’s visible width/height in meters and set in Unity’s camera controller.
+  - Align the virtual screen plane so the camera frustum matches the physical display.
 
-Servo Motors (At least 2): [WWZMDiB SG90 Micro Servo Motor (3 Pcs) ($9.98)](https://www.amazon.com/WWZMDiB-SG90-Control-Servos-Arduino/dp/B0BKPL2Y21?crid=1J52HE9B003AC&dib=eyJ2IjoiMSJ9.zKdFX4LDfJj3RzL495S_2TuwhgVIi7j06WLFuMiyPHn0CEZoIaXiPe2kmULyG2IkY3NRlcRWWhkumo0MhHsMp988riHEPmZrULLqc9kThsclZ-6JV6wozo9HOOHIVF3MexYkBVivTZjZKRDFes6Ll8v0U-Dvn10WC7Rdmc4jYXYkQ8DAi1Tv85ehM7nTO5LCmaT7zJrtH47oDSQBCJdQys9He130ZRhRJZyZYY2-GNSgpQSmswk0udfb8iHRuRXI3abCue7Ia7PvvmR8h-jPMFt1ENlyB-OxKAM9gbugb0c.2r0NecAh9-KnOzb4hyKyJKsDwbzb-D03EGdsOuxyTuU&dib_tag=se&keywords=servo%2Bmotor&qid=1762807031&sprefix=servo%2Bmotor%2Caps%2C151&sr=8-6&th=1)
-I think something like this might be good. Needs to be a servo motor (probably) and have no problem moving around the weight of the camera (0.07 kg) and the weight of another servo motor. I have to double check if this one has that. Might be best to consult Patrick on this one.
+Tip: If calibration isn’t available, the system still functions using approximate values, but perceived depth and parallax may be reduced.
 
+---
 
+## Configuration & Tuning
+
+- Smoothing/prediction:
+  - A lightweight constant-velocity or 1D/3D Kalman filter reduces jitter.
+  - Increase smoothing for stability; decrease for responsiveness.
+- Camera resolution:
+  - 720p at 30 fps is generally usable; 1080p at 30–60 fps improves stability.
+- Face orientation:
+  - Frontal pose yields the most accurate depth. The tracker includes logic to compensate for yaw/pitch to avoid bounding-box size bias.
+- ArUco markers:
+  - Use when face landmarks are unreliable or for repeatable lab tests.
+  - Choose a dictionary (e.g., DICT_4X4_50) and print markers at known sizes.
+
+---
+
+## Hardware (Optional)
+
+- Webcam: Any UVC-compatible 720p+ camera works; low-light performance helps.
+- Pan-tilt rig:
+  - 2× metal gear servos (e.g., MG996R ) with a pan-tilt bracket or 3D-printed mount.
+  - ![Example Setup](hardwareSetup.png)
+  - Arduino (e.g., Nano/Uno). Upload panTiltServoFaceTracking.ino.
+  - The tracking script can output target angles over serial; the Arduino maps to servo PWM.
+- Marker board:
+  - Printed ArUco board or single marker for 6DoF tracking.
+
+Always secure moving parts and respect servo torque limits and duty cycles.
+
+---
+
+## Troubleshooting
+
+- The scene feels “flat” or depth looks wrong:
+  - Double-check display physical size and camera intrinsics (camera intrinsices is VERY IMPORTANT).
+  - Ensure Unity units are in meters and consistent with tracking output.
+- Jitter or lag:
+  - Increase smoothing; ensure stable lighting; raise camera resolution/fps.
+  - Prefer wired networking for remote setups.
+- Multi-display misalignment:
+  - Verify each display’s position and physical size in Unity.
+  - Ensure all displays render from the same tracked frustum with correct viewport setup.
+- Mediapipe errors:
+  - Update mediapipe and opencv-python to latest compatible versions.
+  - Test with a well-lit, high-contrast face and neutral background.
+
+---
+
+## Privacy
+
+All tracking is local by default. If you enable network streaming, data is sent to the configured host only. No images are uploaded. Review and comply with privacy policies if used in public demos.
+
+---
+
+## Contributing
+
+Issues and PRs are welcome. If you’re proposing a feature:
+- Describe the use case
+- Attach logs or a short screen capture
+- Include OS/Unity/Python versions and hardware details
+
+---
+
+## License
+
+Specify your license here (e.g., MIT). Include a LICENSE file at the repository root.
+
+---
+
+## Acknowledgments
+
+- MediaPipe and OpenCV for robust real-time vision
+- Unity for flexible rendering and multi-display support
+- Community research on head-coupled perspective rendering
+
+If you have questions or need help replicating the setup, open an issue with your environment details.
