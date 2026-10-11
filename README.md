@@ -228,7 +228,7 @@ Issues and PRs are welcome. If you’re proposing a feature:
 
 ## License
 
-Specify your license here (e.g., MIT). Include a LICENSE file at the repository root.
+MIT
 
 ---
 
